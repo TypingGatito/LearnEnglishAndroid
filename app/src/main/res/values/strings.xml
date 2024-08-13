@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name" translatable="false">LearningApp</string>
+    <string name="button_skip">Skip</string>
+    <string name="button_continue">Continue</string>
+    <string name="title_correct">Correct</string>
+    <string name="title_wrong">Wrong</string>
+    <string name="message_correct">Correct</string>
+    <string name="message_wrong">Wrong</string>
+</resources>
