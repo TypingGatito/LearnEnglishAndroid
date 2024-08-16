@@ -9,4 +9,7 @@
 
     <string name="welcome_text">Welcome to Hogwarts</string>
     <string name="start_test">Start test</string>
+
+    <string name="notification_title">-10 point to Gryffindor</string>
+    <string name="notification_body">You haven\'t practised for quite a lot</string>
 </resources>

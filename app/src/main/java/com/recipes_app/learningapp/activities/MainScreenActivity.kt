@@ -1,5 +1,6 @@
 package com.recipes_app.learningapp.activities
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
@@ -9,11 +10,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.recipes_app.learningapp.R
 import com.recipes_app.learningapp.databinding.ActivityLearnWordBinding
 import com.recipes_app.learningapp.databinding.ActivityMainScreenBinding
 import com.recipes_app.learningapp.questions.QuestionGenerator
 import com.recipes_app.learningapp.questions.QuestionGeneratorPreload
+import com.recipes_app.learningapp.workers.UserActivityWorker
+import java.util.concurrent.TimeUnit
 
 class MainScreenActivity : AppCompatActivity() {
     private var _binding: ActivityMainScreenBinding? = null
@@ -41,6 +47,13 @@ class MainScreenActivity : AppCompatActivity() {
         availableThemes = questionGenerator.getThemes()
 
         setOnClicks()
+
+        val sharedPreferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putLong("lastLaunchTime", System.currentTimeMillis())
+        editor.apply()
+
+        setNotifications()
     }
 
     private fun setOnClicks() {
@@ -75,5 +88,12 @@ class MainScreenActivity : AppCompatActivity() {
             spinnerThemes.adapter = adapter
 
         }
+    }
+
+    private fun setNotifications() {
+        val checkUserActivityWorkRequest = PeriodicWorkRequestBuilder<UserActivityWorker>(20, TimeUnit.MINUTES)
+            .build()
+
+        WorkManager.getInstance(this).enqueue(checkUserActivityWorkRequest)
     }
 }
