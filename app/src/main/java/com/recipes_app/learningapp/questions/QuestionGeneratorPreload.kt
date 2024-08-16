@@ -23,6 +23,7 @@ class QuestionGeneratorPreload :
         Word("Nursing home","Дом престарелых", "Здания"),
         Word("Hospital","Больница", "Здания"),
         Word("School","Школа", "Здания"),
+        Word("Church","Церковь", "Здания"),
     )
 
     private var currentQuestion: Question? = null
