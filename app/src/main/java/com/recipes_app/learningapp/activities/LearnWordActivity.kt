@@ -1,28 +1,43 @@
-package com.recipes_app.learningapp
+package com.recipes_app.learningapp.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import com.recipes_app.learningapp.R
 import com.recipes_app.learningapp.databinding.ActivityLearnWordBinding
+import com.recipes_app.learningapp.questions.NUMBER_OF_ANSWERS
+import com.recipes_app.learningapp.questions.Question
+import com.recipes_app.learningapp.questions.QuestionGenerator
+import com.recipes_app.learningapp.questions.QuestionGeneratorPreload
 
-class MainActivity : AppCompatActivity() {
+class LearnWordActivity : AppCompatActivity() {
     private var _binding: ActivityLearnWordBinding? = null
     private val binding
         get() = _binding ?: throw IllegalStateException("Binding in MainActivity is null")
-    private val questionGenerator: QuestionGenerator = QuestionGenerator()
-
-    //private lateinit var binding: ActivityLearnWordBinding
+    private val questionGenerator: QuestionGenerator = QuestionGeneratorPreload()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_learn_word)
 
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.learnWord)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
         _binding = ActivityLearnWordBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val numOfWords = intent.getIntExtra("numOfWords", 0)
+        val theme: String = "" + intent.getStringExtra("theme")
+        questionGenerator.startTest(numOfWords, theme)
         showNextQuestion(questionGenerator)
 
         with(binding) {
@@ -46,17 +61,12 @@ class MainActivity : AppCompatActivity() {
             btnSkip.setOnClickListener {
                 showNextQuestion(questionGenerator)
             }
-        }
 
-//        val tvWordToTranslate: TextView = findViewById(R.id.tvWordToTranslate)
-//        tvWordToTranslate.text = "GGGG"
-//        tvWordToTranslate.setTextColor(Color.BLUE)
-//        tvWordToTranslate.setTextColor(Color.parseColor("#FFFFFF"))
-////        tvWordToTranslate.setTextColor(ContextCompat.getColor(this, R.color.textViewOptions))
-//        with(binding) {
-//            tvWordToTranslate.text = "Galaxy"
-//            tvWordToTranslate.isVisible = true
-//        }
+            btnClose.setOnClickListener {
+                val intent: Intent = Intent(this@LearnWordActivity, MainScreenActivity::class.java)
+                startActivity(intent)
+            }
+        }
 
     }
 
@@ -67,26 +77,26 @@ class MainActivity : AppCompatActivity() {
     ) {
 
         layoutAnswer.background = ContextCompat.getDrawable(
-            this@MainActivity,
+            this@LearnWordActivity,
             R.drawable.shape_rounded_container
         )
 
 
 
         tvVariantValue.setTextColor(ContextCompat.getColor(
-            this@MainActivity,
+            this@LearnWordActivity,
             R.color.textViewOptions
         ))
 
 
         tvVariantNumber.apply {
             setTextColor(ContextCompat.getColor(
-                this@MainActivity,
+                this@LearnWordActivity,
                 R.color.textViewOptions
             ))
 
             background = ContextCompat.getDrawable(
-                this@MainActivity,
+                this@LearnWordActivity,
                 R.drawable.shape_rounded_variants
             )
         }
@@ -99,23 +109,25 @@ class MainActivity : AppCompatActivity() {
         tvVariantValue: TextView,
     ) {
         layoutAnswer.background = ContextCompat.getDrawable(
-            this@MainActivity,
+            this@LearnWordActivity,
             R.drawable.shape_rounded_container_correct
         )
 
         tvVariantNumber.background = ContextCompat.getDrawable(
-            this@MainActivity,
+            this@LearnWordActivity,
             R.drawable.shape_rounded_variants_correct
         )
 
         tvVariantNumber.setTextColor(ContextCompat.getColor(
             this,
-            R.color.white)
+            R.color.white
+        )
         )
 
         tvVariantValue.setTextColor(ContextCompat.getColor(
             this,
-            R.color.correctGreenColor)
+            R.color.correctGreenColor
+        )
         )
 
     }
@@ -126,23 +138,25 @@ class MainActivity : AppCompatActivity() {
         tvVariantValue: TextView,
     ) {
         layoutAnswer.background = ContextCompat.getDrawable(
-            this@MainActivity,
+            this@LearnWordActivity,
             R.drawable.shape_rounded_container_wrong
         )
 
         tvVariantNumber.background = ContextCompat.getDrawable(
-            this@MainActivity,
+            this@LearnWordActivity,
             R.drawable.shape_rounded_variants_wrong
         )
 
         tvVariantNumber.setTextColor(ContextCompat.getColor(
             this,
-            R.color.white)
+            R.color.white
+        )
         )
 
         tvVariantValue.setTextColor(ContextCompat.getColor(
             this,
-            R.color.wrongRedColor)
+            R.color.wrongRedColor
+        )
         )
     }
 
@@ -152,12 +166,12 @@ class MainActivity : AppCompatActivity() {
         val resIconResource: Int
 
         if (isCorrect) {
-            color = ContextCompat.getColor(this@MainActivity, R.color.correctGreenColor)
-            messageText = ContextCompat.getString(this@MainActivity, R.string.message_correct)
+            color = ContextCompat.getColor(this@LearnWordActivity, R.color.correctGreenColor)
+            messageText = ContextCompat.getString(this@LearnWordActivity, R.string.message_correct)
             resIconResource = R.drawable.ic_correct
         } else {
-            color = ContextCompat.getColor(this@MainActivity, R.color.wrongRedColor)
-            messageText = ContextCompat.getString(this@MainActivity, R.string.message_wrong)
+            color = ContextCompat.getColor(this@LearnWordActivity, R.color.wrongRedColor)
+            messageText = ContextCompat.getString(this@LearnWordActivity, R.string.message_wrong)
             resIconResource = R.drawable.ic_wrong
         }
 
@@ -175,11 +189,15 @@ class MainActivity : AppCompatActivity() {
         val question: Question? = questionGenerator.getNextQuestion()
 
         with(binding) {
-            if (question == null || question.variants.size < NUMBER_OF_ANSWERS) {
+            if (question == null) {
                 tvWordToTranslate.isVisible = false
                 layoutAnswers.isVisible = false
                 btnSkip.isVisible = true
                 btnSkip.text = "Поздравляем"
+                btnSkip.setOnClickListener {
+                    val intent: Intent = Intent(this@LearnWordActivity, MainScreenActivity::class.java)
+                    startActivity(intent)
+                }
             } else {
                 tvWordToTranslate.isVisible = true
                 layoutAnswers.isVisible = true

@@ -4,7 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical">
+    android:id="@+id/learnWord"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true" >
 
     <ImageButton
         android:id="@+id/btnClose"
@@ -163,7 +165,7 @@
         android:id="@+id/btnSkip"
         android:layout_width="310dp"
         android:layout_height="58dp"
-        android:backgroundTint="#2574FF"
+        android:backgroundTint="@color/blueButton"
         android:text="@string/button_skip"
         android:textAllCaps="true"
         app:layout_constraintBottom_toBottomOf="parent"

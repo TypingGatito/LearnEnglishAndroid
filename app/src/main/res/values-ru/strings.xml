@@ -1,9 +1,11 @@
 <resources>
-    <string name="app_name">LearningApp</string>
+    <string name="app_name">Хогвартс</string>
     <string name="button_skip">Пропустить</string>
     <string name="button_continue">Продолжить</string>
     <string name="title_correct">Верно</string>
     <string name="title_wrong">Неверно</string>
     <string name="message_correct">Верно</string>
     <string name="message_wrong">Неверно</string>
+    <string name="start_test">Начать тест</string>
+    <string name="welcome_text">Добро пожаловать в Хогвартс</string>
 </resources>
