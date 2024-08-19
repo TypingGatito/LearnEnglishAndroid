@@ -7,7 +7,7 @@
     <string name="message_correct">Верно</string>
     <string name="message_wrong">Неверно</string>
     <string name="start_test">Начать тест</string>
-    <string name="welcome_text">Добро пожаловать в Хогвартс</string>
+    <string name="welcome_text">Добро пожаловать в Хогвартс!</string>
     <string name="notification_title">-10 очков Гриффиндору</string>
     <string name="notification_body">Вы давно не занимались</string>
 </resources>

@@ -4,8 +4,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="textViewOptions">#888992</color>
+    <color name="grey">#808080</color>
     <color name="correctGreenColor">#0EAD69</color>
     <color name="wrongRedColor">#FA4169</color>
-    <color name="blueButton">#2574FF</color>
+    <color name="blue">#2574FF</color>
 
 </resources>

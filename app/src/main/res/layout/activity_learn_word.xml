@@ -20,6 +20,40 @@
         android:layout_marginTop="24dp"
         android:layout_marginStart="24dp" />
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="250dp"
+        android:layout_height="30dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btnClose"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/btnClose">
+
+        <ProgressBar
+            android:id="@+id/pbQuestionProgress"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            style="@style/ProgressBarQuestionProgressStyle"
+            android:max="100"
+            android:progress="10"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvProgressText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="50"
+            android:textColor="@color/grey"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@+id/pbQuestionProgress"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/pbQuestionProgress"
+            app:layout_constraintTop_toTopOf="@+id/pbQuestionProgress" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
     <TextView
         android:id="@+id/tvWordToTranslate"
         android:layout_width="wrap_content"
@@ -165,7 +199,7 @@
         android:id="@+id/btnSkip"
         android:layout_width="310dp"
         android:layout_height="58dp"
-        android:backgroundTint="@color/blueButton"
+        android:backgroundTint="@color/blue"
         android:text="@string/button_skip"
         android:textAllCaps="true"
         app:layout_constraintBottom_toBottomOf="parent"

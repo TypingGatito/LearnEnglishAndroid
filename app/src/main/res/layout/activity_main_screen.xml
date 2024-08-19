@@ -77,8 +77,11 @@
     </LinearLayout>
 
     <ImageView
-        android:layout_width="350dp"
-        android:layout_height="450dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintHeight="wrap_content_constrained"
+        app:layout_constraintWidth="wrap_content_constrained"
+        android:layout_marginHorizontal="20dp"
         android:layout_marginVertical="10dp"
         android:src="@drawable/ic_harry_potter_hat"
         app:layout_constraintBottom_toTopOf="@+id/btnStartTest"
@@ -91,7 +94,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:backgroundTint="@color/blueButton"
+        android:backgroundTint="@color/blue"
         android:text="@string/start_test"
         android:textSize="20sp"
         android:layout_marginBottom="30dp"

@@ -24,13 +24,45 @@ class QuestionGeneratorPreload :
         Word("Hospital","Больница", "Здания"),
         Word("School","Школа", "Здания"),
         Word("Church","Церковь", "Здания"),
+        Word("Church", "Церковь", "Здания"),
+        Word("Cathedral", "Собор", "Здания"),
+        Word("Chapel", "Часовня", "Здания"),
+        Word("Basilica", "Базилика", "Здания"),
+        Word("Monastery", "Монастырь", "Здания"),
+        Word("Palace", "Дворец", "Здания"),
+        Word("Mansion", "Особняк", "Здания"),
+        Word("Temple", "Храм", "Здания"),
+        Word("Library", "Библиотека", "Здания"),
+        Word("Museum", "Музей", "Здания"),
+        Word("Airport", "Аэропорт", "Здания"),
+        Word("Station", "Вокзал", "Здания"),
+
+        Word("Bread", "Хлеб", "Еда"),
+        Word("Cheese", "Сыр", "Еда"),
+        Word("Butter", "Масло", "Еда"),
+        Word("Meat", "Мясо", "Еда"),
+        Word("Fruit", "Фрукты", "Еда"),
+        Word("Vegetable", "Овощи", "Еда"),
+
+        Word("Milk", "Молоко", "Напитки"),
+        Word("Juice", "Сок", "Напитки"),
+        Word("Tea", "Чай", "Напитки"),
+        Word("Coffee", "Кофе", "Напитки"),
+
+        Word("Train", "Поезд", "Транспорт"),
+        Word("Bus", "Автобус", "Транспорт"),
+        Word("Airplane", "Самолет", "Транспорт"),
+        Word("Ship", "Корабль", "Транспорт"),
+        Word("Bicycle", "Велосипед", "Транспорт"),
+
+        Word("Ticket", "Билет", "Документы"),
+        Word("Passport", "Паспорт", "Документы"),
+        Word("Luggage", "Багаж", "Документы"),
     )
 
-    private var currentQuestion: Question? = null
-
-    private var count: Int = 1
-
     private var curWords: List<Word> = dictionary
+
+    private var testProgress: TestProgress = TestProgress()
 
     override fun startTest(numOfWords: Int, theme: String) {
 
@@ -38,13 +70,16 @@ class QuestionGeneratorPreload :
             word: Word -> word.theme == theme
         }
 
-        count = if (curWords.size < numOfWords) curWords.size else numOfWords
+        val numOfQuestions = if (curWords.size < numOfWords) curWords.size else numOfWords
+
+        testProgress.setAll(numOfQuestions)
     }
 
-    override fun getNextQuestion(): Question? {
-
-        val notLearnedList = curWords.filter { !it.learned }
-        if (notLearnedList.isEmpty() || count == 0) return null
+    override fun nextQuestion(): TestProgress {
+        if (!testProgress.needsQuestions()) {
+            testProgress.curQuestion = null
+            return testProgress
+        }
 
         val questionWords =
             if (curWords.size < NUMBER_OF_ANSWERS) {
@@ -57,18 +92,17 @@ class QuestionGeneratorPreload :
 
         val correctAnswer: Word = questionWords.random()
 
-        currentQuestion = Question(
+
+        testProgress.curQuestion = Question(
             variants = questionWords,
             correctAnswer = correctAnswer,
         )
-
-        count--
-        return currentQuestion
+        testProgress.nextQuestion()
+        return testProgress
     }
 
-    override fun checkAnswer(userAnswerIndex: Int?): Boolean {
-
-        return currentQuestion?.let {
+    override fun answer(userAnswerIndex: Int): Boolean {
+        val isCorrect: Boolean = testProgress.curQuestion?.let {
             val correctAnswerId = it.variants.indexOf(it.correctAnswer)
             if (correctAnswerId == userAnswerIndex) {
                 it.correctAnswer.learned = true
@@ -77,6 +111,11 @@ class QuestionGeneratorPreload :
                 false
             }
         } ?: false
+
+        val ans: Answer = Answer(testProgress.curQuestion, userAnswerIndex, testProgress.numOfCurQuestion)
+        if (!isCorrect) testProgress.wrongAnswers.add(ans)
+
+        return isCorrect
     }
 
     override fun getThemes(): Set<String> {

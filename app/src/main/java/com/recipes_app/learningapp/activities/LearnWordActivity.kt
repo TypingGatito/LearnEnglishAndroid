@@ -11,10 +11,10 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.recipes_app.learningapp.R
 import com.recipes_app.learningapp.databinding.ActivityLearnWordBinding
-import com.recipes_app.learningapp.questions.NUMBER_OF_ANSWERS
 import com.recipes_app.learningapp.questions.Question
 import com.recipes_app.learningapp.questions.QuestionGenerator
 import com.recipes_app.learningapp.questions.QuestionGeneratorPreload
+import com.recipes_app.learningapp.questions.TestProgress
 
 class LearnWordActivity : AppCompatActivity() {
     private var _binding: ActivityLearnWordBinding? = null
@@ -66,6 +66,12 @@ class LearnWordActivity : AppCompatActivity() {
                 val intent: Intent = Intent(this@LearnWordActivity, MainScreenActivity::class.java)
                 startActivity(intent)
             }
+
+            pbQuestionProgress.apply {
+                max = numOfWords
+                progress = 1
+            }
+
         }
 
     }
@@ -186,7 +192,9 @@ class LearnWordActivity : AppCompatActivity() {
     }
 
     private fun showNextQuestion(questionGenerator: QuestionGenerator) {
-        val question: Question? = questionGenerator.getNextQuestion()
+        val testProgress: TestProgress = questionGenerator.nextQuestion()
+        changeProgressBar(testProgress.numOfCurQuestion)
+        val question: Question? = testProgress.curQuestion
 
         with(binding) {
             if (question == null) {
@@ -211,7 +219,7 @@ class LearnWordActivity : AppCompatActivity() {
             }
 
             layoutAnswer1.setOnClickListener{
-                if(questionGenerator.checkAnswer(0)) {
+                if(questionGenerator.answer(0)) {
                     markAnswerCorrect(layoutAnswer1,
                         tvVariantNumber1,
                         tvVariantValue1)
@@ -225,7 +233,7 @@ class LearnWordActivity : AppCompatActivity() {
             }
 
             layoutAnswer2.setOnClickListener{
-                if(questionGenerator.checkAnswer(1)) {
+                if(questionGenerator.answer(1)) {
                     markAnswerCorrect(layoutAnswer2,
                         tvVariantNumber2,
                         tvVariantValue2)
@@ -239,7 +247,7 @@ class LearnWordActivity : AppCompatActivity() {
             }
 
             layoutAnswer3.setOnClickListener{
-                if(questionGenerator.checkAnswer(2)) {
+                if(questionGenerator.answer(2)) {
                     markAnswerCorrect(layoutAnswer3,
                         tvVariantNumber3,
                         tvVariantValue3)
@@ -253,7 +261,7 @@ class LearnWordActivity : AppCompatActivity() {
             }
 
             layoutAnswer4.setOnClickListener{
-                if(questionGenerator.checkAnswer(3)) {
+                if(questionGenerator.answer(3)) {
                     markAnswerCorrect(layoutAnswer4,
                         tvVariantNumber4,
                         tvVariantValue4)
@@ -266,5 +274,10 @@ class LearnWordActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun changeProgressBar(progress: Int) {
+        binding.pbQuestionProgress.progress = progress
+        binding.tvProgressText.text = progress.toString()
     }
 }

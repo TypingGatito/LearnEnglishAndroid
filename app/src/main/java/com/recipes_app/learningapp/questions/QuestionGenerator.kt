@@ -1,9 +1,9 @@
 package com.recipes_app.learningapp.questions
 
 interface QuestionGenerator {
-    fun getNextQuestion(): Question?
+    fun nextQuestion(): TestProgress
 
-    fun checkAnswer(userAnswerIndex: Int?): Boolean
+    fun answer(userAnswerIndex: Int): Boolean
 
     fun getThemes(): Set<String>
 

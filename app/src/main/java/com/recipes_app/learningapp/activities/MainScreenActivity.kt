@@ -7,14 +7,12 @@ import android.widget.ArrayAdapter
 import android.widget.SeekBar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.recipes_app.learningapp.R
-import com.recipes_app.learningapp.databinding.ActivityLearnWordBinding
+import com.recipes_app.learningapp.adapters.ThemesSpinnerAdapter
 import com.recipes_app.learningapp.databinding.ActivityMainScreenBinding
 import com.recipes_app.learningapp.questions.QuestionGenerator
 import com.recipes_app.learningapp.questions.QuestionGeneratorPreload
@@ -81,10 +79,13 @@ class MainScreenActivity : AppCompatActivity() {
                 }
             })
 
-            val adapter = ArrayAdapter(this@MainScreenActivity,
-                android.R.layout.simple_spinner_item,
+            val adapter = ThemesSpinnerAdapter(this@MainScreenActivity,
                 availableThemes.toList())
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+//            val adapter = ArrayAdapter(this@MainScreenActivity,
+//                android.R.layout.simple_spinner_item,
+//                availableThemes.toList())
+//            adapter.setDropDownViewResource(R.layout.spinner_main_item)
+
             spinnerThemes.adapter = adapter
 
         }
