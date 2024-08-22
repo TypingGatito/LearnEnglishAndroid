@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 class MainScreenActivity : AppCompatActivity() {
     private var _binding: ActivityMainScreenBinding? = null
     private val binding
-        get() = _binding ?: throw IllegalStateException("Binding in MainActivity is null")
+        get() = _binding ?: throw IllegalStateException("Binding in MainScreen is null")
 
     private val questionGenerator: QuestionGenerator = QuestionGeneratorPreload()
 

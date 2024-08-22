@@ -2,8 +2,10 @@ package com.recipes_app.learningapp.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.SyncStateContract.Constants
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -15,17 +17,19 @@ import com.recipes_app.learningapp.questions.Question
 import com.recipes_app.learningapp.questions.QuestionGenerator
 import com.recipes_app.learningapp.questions.QuestionGeneratorPreload
 import com.recipes_app.learningapp.questions.TestProgress
+import java.util.ArrayList
 
 class LearnWordActivity : AppCompatActivity() {
     private var _binding: ActivityLearnWordBinding? = null
     private val binding
-        get() = _binding ?: throw IllegalStateException("Binding in MainActivity is null")
+        get() = _binding ?: throw IllegalStateException("Binding in LearnWordActivity is null")
     private val questionGenerator: QuestionGenerator = QuestionGeneratorPreload()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_learn_word)
 
+        enableEdgeToEdge()
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.learnWord)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -68,7 +72,7 @@ class LearnWordActivity : AppCompatActivity() {
             }
 
             pbQuestionProgress.apply {
-                max = numOfWords
+                max = questionGenerator.numOfQuestions
                 progress = 1
             }
 
@@ -198,14 +202,9 @@ class LearnWordActivity : AppCompatActivity() {
 
         with(binding) {
             if (question == null) {
-                tvWordToTranslate.isVisible = false
-                layoutAnswers.isVisible = false
-                btnSkip.isVisible = true
-                btnSkip.text = "Поздравляем"
-                btnSkip.setOnClickListener {
-                    val intent: Intent = Intent(this@LearnWordActivity, MainScreenActivity::class.java)
-                    startActivity(intent)
-                }
+                val intent: Intent = Intent(this@LearnWordActivity, TestResultActivity::class.java)
+                intent.putParcelableArrayListExtra("answers", ArrayList(testProgress.wrongAnswers))
+                startActivity(intent)
             } else {
                 tvWordToTranslate.isVisible = true
                 layoutAnswers.isVisible = true

@@ -10,4 +10,8 @@
     <string name="welcome_text">Добро пожаловать в Хогвартс!</string>
     <string name="notification_title">-10 очков Гриффиндору</string>
     <string name="notification_body">Вы давно не занимались</string>
+    <string name="button_result">На главный!</string>
+    <string name="title_result">Результат</string>
+    <string name="desc_result_pref">Вы допустили</string>
+    <string name="desc_result_post">ошибок!</string>
 </resources>

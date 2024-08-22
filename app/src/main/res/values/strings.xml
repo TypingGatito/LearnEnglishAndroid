@@ -12,4 +12,9 @@
 
     <string name="notification_title">-10 point to Gryffindor</string>
     <string name="notification_body">You haven\'t practised for quite a lot</string>
+
+    <string name="button_result">To main!</string>
+    <string name="title_result">Result</string>
+    <string name="desc_result_pref">You have made</string>
+    <string name="desc_result_post">mistakes!</string>
 </resources>

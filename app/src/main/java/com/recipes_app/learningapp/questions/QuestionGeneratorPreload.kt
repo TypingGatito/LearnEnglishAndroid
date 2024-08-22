@@ -64,13 +64,17 @@ class QuestionGeneratorPreload :
 
     private var testProgress: TestProgress = TestProgress()
 
+    override var numOfQuestions: Int = 0
+        get() = field
+        set(numOfQuestions) {field = numOfQuestions}
+
     override fun startTest(numOfWords: Int, theme: String) {
 
         curWords = dictionary.filter {
             word: Word -> word.theme == theme
         }
 
-        val numOfQuestions = if (curWords.size < numOfWords) curWords.size else numOfWords
+        numOfQuestions = if (curWords.size < numOfWords) curWords.size else numOfWords
 
         testProgress.setAll(numOfQuestions)
     }
