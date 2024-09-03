@@ -1,4 +1,4 @@
-package com.recipes_app.learningapp.questions
+package com.recipes_app.learningapp.models.questions
 
 import android.os.Parcel
 import android.os.Parcelable
@@ -35,10 +35,10 @@ data class Answer(
     }
 
     fun getUsersAnswer(): String = question?.let {
-        it.variants.getOrNull(indexOfUsersAns)?.translate ?: "Unknown"
+        it.variants.getOrNull(indexOfUsersAns)?.translated ?: "Unknown"
     } ?: "Unknown"
 
     fun getQuestionWord(): String = question?.correctAnswer?.original ?: "Unknown"
 
-    fun getRightAnswer(): String = question?.correctAnswer?.translate ?: "Unknown"
+    fun getRightAnswer(): String = question?.correctAnswer?.translated ?: "Unknown"
 }

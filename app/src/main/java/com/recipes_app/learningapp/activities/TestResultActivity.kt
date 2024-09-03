@@ -11,12 +11,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.recipes_app.learningapp.R
 import com.recipes_app.learningapp.adapters.AnswerAdapter
 import com.recipes_app.learningapp.databinding.ActivityTestResultBinding
-import com.recipes_app.learningapp.questions.Answer
+import com.recipes_app.learningapp.models.questions.Answer
+import com.recipes_app.learningapp.presenters.TestResultPresenter
+import com.recipes_app.learningapp.presenters.TestResultPresenterMain
 
-class TestResultActivity : AppCompatActivity() {
+class TestResultActivity : AppCompatActivity(), TestResultView {
     private var _binding: ActivityTestResultBinding? = null
     private val binding
         get() = _binding ?: throw IllegalStateException("Binding in TestResultActivity is null")
+
+    private lateinit var presenter: TestResultPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,8 +36,11 @@ class TestResultActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setOnClicks()
-        setAnswersRecyclerView()
-        setText()
+        showAnswers()
+        showResultText()
+
+        presenter = TestResultPresenterMain(this)
+        presenter.onViewCreated()
     }
 
     private fun setOnClicks() {
@@ -45,7 +52,7 @@ class TestResultActivity : AppCompatActivity() {
         }
     }
 
-    private fun setAnswersRecyclerView() {
+    override fun showAnswers() {
         with(binding) {
             val answers: List<Answer>? = intent.getParcelableArrayListExtra("answers")
             rvWrongAnswers.adapter = AnswerAdapter(answers!!)
@@ -54,7 +61,7 @@ class TestResultActivity : AppCompatActivity() {
         }
     }
 
-    private fun setText() {
+    override fun showResultText() {
         val answers: List<Answer>? = intent.getParcelableArrayListExtra("answers")
         with(binding) {
             tvResultDescription.text = ContextCompat.getString(this@TestResultActivity, R.string.desc_result_pref) +

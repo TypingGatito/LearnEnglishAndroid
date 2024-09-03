@@ -1,4 +1,4 @@
-package com.recipes_app.learningapp.questions
+package com.recipes_app.learningapp.models.questions
 
 
 class TestProgress {

@@ -1,9 +1,9 @@
-package com.recipes_app.learningapp.questions
+package com.recipes_app.learningapp.business_classes
+
+import com.recipes_app.learningapp.models.questions.TestProgress
 
 interface QuestionGenerator {
     var numOfQuestions: Int
-        get() { return  1}
-        set(v) {}
 
     fun nextQuestion(): TestProgress
 

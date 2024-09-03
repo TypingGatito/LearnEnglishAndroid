@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.recipes_app.learningapp.R
-import com.recipes_app.learningapp.questions.Answer
+import com.recipes_app.learningapp.models.questions.Answer
 
 class AnswerAdapter(val answers: List<Answer>) : RecyclerView.Adapter<AnswerAdapter.MyViewHolder>() {
     class MyViewHolder(view: View): RecyclerView.ViewHolder(view) {

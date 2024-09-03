@@ -3,7 +3,6 @@ package com.recipes_app.learningapp.activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ArrayAdapter
 import android.widget.SeekBar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -14,8 +13,10 @@ import androidx.work.WorkManager
 import com.recipes_app.learningapp.R
 import com.recipes_app.learningapp.adapters.ThemesSpinnerAdapter
 import com.recipes_app.learningapp.databinding.ActivityMainScreenBinding
-import com.recipes_app.learningapp.questions.QuestionGenerator
-import com.recipes_app.learningapp.questions.QuestionGeneratorPreload
+import com.recipes_app.learningapp.business_classes.QuestionGenerator
+import com.recipes_app.learningapp.business_classes.QuestionGeneratorPreload
+import com.recipes_app.learningapp.repositories.words.WordRepositorySqlite
+import com.recipes_app.learningapp.services.words.WordService
 import com.recipes_app.learningapp.workers.UserActivityWorker
 import java.util.concurrent.TimeUnit
 
@@ -24,7 +25,10 @@ class MainScreenActivity : AppCompatActivity() {
     private val binding
         get() = _binding ?: throw IllegalStateException("Binding in MainScreen is null")
 
-    private val questionGenerator: QuestionGenerator = QuestionGeneratorPreload()
+    private var _questionGenerator: QuestionGenerator? = null
+
+    private val questionGenerator: QuestionGenerator
+        get() = _questionGenerator ?: throw IllegalStateException("QuestionGenerator is null")
 
     private var availableThemes: Set<String> = HashSet<String>()
 
@@ -42,6 +46,8 @@ class MainScreenActivity : AppCompatActivity() {
         _binding = ActivityMainScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        _questionGenerator = QuestionGeneratorPreload(WordService(WordRepositorySqlite(this@MainScreenActivity, null)))
+
         availableThemes = questionGenerator.getThemes()
 
         setOnClicks()
@@ -52,6 +58,9 @@ class MainScreenActivity : AppCompatActivity() {
         editor.apply()
 
         setNotifications()
+
+//        val appInstallReceiver = AppInstallReceiver()
+//        registerReceiver(appInstallReceiver, IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED))
     }
 
     private fun setOnClicks() {
@@ -81,10 +90,6 @@ class MainScreenActivity : AppCompatActivity() {
 
             val adapter = ThemesSpinnerAdapter(this@MainScreenActivity,
                 availableThemes.toList())
-//            val adapter = ArrayAdapter(this@MainScreenActivity,
-//                android.R.layout.simple_spinner_item,
-//                availableThemes.toList())
-//            adapter.setDropDownViewResource(R.layout.spinner_main_item)
 
             spinnerThemes.adapter = adapter
 
@@ -92,9 +97,11 @@ class MainScreenActivity : AppCompatActivity() {
     }
 
     private fun setNotifications() {
-        val checkUserActivityWorkRequest = PeriodicWorkRequestBuilder<UserActivityWorker>(20, TimeUnit.MINUTES)
+        val checkUserActivityWorkRequest = PeriodicWorkRequestBuilder<UserActivityWorker>(24, TimeUnit.HOURS)
             .build()
 
         WorkManager.getInstance(this).enqueue(checkUserActivityWorkRequest)
     }
+
+
 }

@@ -2,7 +2,6 @@ package com.recipes_app.learningapp.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.provider.SyncStateContract.Constants
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -13,17 +12,25 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.recipes_app.learningapp.R
 import com.recipes_app.learningapp.databinding.ActivityLearnWordBinding
-import com.recipes_app.learningapp.questions.Question
-import com.recipes_app.learningapp.questions.QuestionGenerator
-import com.recipes_app.learningapp.questions.QuestionGeneratorPreload
-import com.recipes_app.learningapp.questions.TestProgress
+import com.recipes_app.learningapp.models.questions.Question
+import com.recipes_app.learningapp.business_classes.QuestionGenerator
+import com.recipes_app.learningapp.business_classes.QuestionGeneratorPreload
+import com.recipes_app.learningapp.models.questions.TestProgress
+import com.recipes_app.learningapp.repositories.words.WordRepositorySqlite
+import com.recipes_app.learningapp.services.words.WordService
 import java.util.ArrayList
 
 class LearnWordActivity : AppCompatActivity() {
     private var _binding: ActivityLearnWordBinding? = null
     private val binding
         get() = _binding ?: throw IllegalStateException("Binding in LearnWordActivity is null")
-    private val questionGenerator: QuestionGenerator = QuestionGeneratorPreload()
+
+    private var _questionGenerator: QuestionGenerator? = null
+
+    private val questionGenerator: QuestionGenerator
+        get() = _questionGenerator ?: throw IllegalStateException("QuestionGenerator is null")
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +45,8 @@ class LearnWordActivity : AppCompatActivity() {
 
         _binding = ActivityLearnWordBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        _questionGenerator = QuestionGeneratorPreload(WordService(WordRepositorySqlite(this@LearnWordActivity, null)))
+
 
         val numOfWords = intent.getIntExtra("numOfWords", 0)
         val theme: String = "" + intent.getStringExtra("theme")
@@ -211,10 +220,10 @@ class LearnWordActivity : AppCompatActivity() {
                 btnSkip.isVisible = true
                 tvWordToTranslate.text = question.correctAnswer.original
 
-                tvVariantValue1.text = question.variants[0].translate
-                tvVariantValue2.text = question.variants[1].translate
-                tvVariantValue3.text = question.variants[2].translate
-                tvVariantValue4.text = question.variants[3].translate
+                tvVariantValue1.text = question.variants[0].translated
+                tvVariantValue2.text = question.variants[1].translated
+                tvVariantValue3.text = question.variants[2].translated
+                tvVariantValue4.text = question.variants[3].translated
             }
 
             layoutAnswer1.setOnClickListener{

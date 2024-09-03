@@ -1,4 +1,4 @@
-package com.recipes_app.learningapp.questions
+package com.recipes_app.learningapp.models.questions
 
 import android.os.Parcel
 import android.os.Parcelable
@@ -8,7 +8,7 @@ data class Question(
     val correctAnswer: Word,
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
-        parcel.createTypedArrayList(Word.CREATOR) ?: emptyList(),
+        parcel.createTypedArrayList(Word) ?: emptyList(),
         parcel.readParcelable(Word::class.java.classLoader)!!
     )
 

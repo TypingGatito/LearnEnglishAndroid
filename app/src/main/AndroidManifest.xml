@@ -16,9 +16,6 @@
         android:theme="@style/Theme.LearningApp"
         tools:targetApi="31">
         <activity
-            android:name=".activities.AnswerActivity"
-            android:exported="false" />
-        <activity
             android:name=".activities.TestResultActivity"
             android:exported="false" />
         <activity
@@ -34,14 +31,22 @@
             android:name=".activities.LearnWordActivity"
             android:exported="false" />
 
-        <receiver
-            android:name=".receivers.AppInstallReceiver"
+        <receiver android:name=".receivers.AppInstallReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
+
+        <!--        <receiver-->
+<!--            android:name=".receivers.AppInstallReceiver"-->
+<!--            android:enabled="true"-->
+<!--            android:exported="false">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.INS" />-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
     </application>
 
 </manifest>

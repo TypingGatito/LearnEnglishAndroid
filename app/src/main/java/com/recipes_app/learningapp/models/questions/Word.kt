@@ -1,11 +1,11 @@
-package com.recipes_app.learningapp.questions
+package com.recipes_app.learningapp.models.questions
 
 import android.os.Parcel
 import android.os.Parcelable
 
 data class Word(
     val original: String,
-    val translate: String,
+    val translated: String,
     val theme: String,
     var learned: Boolean = false,
 ) : Parcelable {
@@ -18,7 +18,7 @@ data class Word(
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(original)
-        parcel.writeString(translate)
+        parcel.writeString(translated)
         parcel.writeString(theme)
         parcel.writeByte(if (learned) 1 else 0) // Преобразуем Boolean в Byte
     }
