@@ -16,6 +16,8 @@ import com.recipes_app.learningapp.models.questions.Question
 import com.recipes_app.learningapp.business_classes.QuestionGenerator
 import com.recipes_app.learningapp.business_classes.QuestionGeneratorPreload
 import com.recipes_app.learningapp.models.questions.TestProgress
+import com.recipes_app.learningapp.presenters.LearnWordPresenter
+import com.recipes_app.learningapp.presenters.LearnWordPresenterMain
 import com.recipes_app.learningapp.repositories.words.WordRepositorySqlite
 import com.recipes_app.learningapp.services.words.WordService
 import java.util.ArrayList
@@ -29,6 +31,8 @@ class LearnWordActivity : AppCompatActivity() {
 
     private val questionGenerator: QuestionGenerator
         get() = _questionGenerator ?: throw IllegalStateException("QuestionGenerator is null")
+
+    private lateinit var presenter: LearnWordPresenter
 
 
 
@@ -47,12 +51,97 @@ class LearnWordActivity : AppCompatActivity() {
         setContentView(binding.root)
         _questionGenerator = QuestionGeneratorPreload(WordService(WordRepositorySqlite(this@LearnWordActivity, null)))
 
+        presenter = LearnWordPresenterMain()
+
 
         val numOfWords = intent.getIntExtra("numOfWords", 0)
         val theme: String = "" + intent.getStringExtra("theme")
         questionGenerator.startTest(numOfWords, theme)
         showNextQuestion(questionGenerator)
 
+        setStartOnClicks()
+        setStartProgressBar()
+    }
+    private fun showNextQuestion(questionGenerator: QuestionGenerator) {
+        val testProgress: TestProgress = questionGenerator.nextQuestion()
+        changeProgressBar(testProgress.numOfCurQuestion)
+        val question: Question? = testProgress.curQuestion
+
+        with(binding) {
+            if (question == null) {
+                val intent: Intent = Intent(this@LearnWordActivity, TestResultActivity::class.java)
+                intent.putParcelableArrayListExtra("wrong_answers", ArrayList(testProgress.wrongAnswers))
+                startActivity(intent)
+            } else {
+                tvWordToTranslate.isVisible = true
+                layoutAnswers.isVisible = true
+                btnSkip.isVisible = true
+                tvWordToTranslate.text = question.correctAnswer.original
+
+                tvVariantValue1.text = question.variants[0].translated
+                tvVariantValue2.text = question.variants[1].translated
+                tvVariantValue3.text = question.variants[2].translated
+                tvVariantValue4.text = question.variants[3].translated
+            }
+
+            layoutAnswer1.setOnClickListener{
+                if(questionGenerator.answer(0)) {
+                    markAnswerCorrect(layoutAnswer1,
+                        tvVariantNumber1,
+                        tvVariantValue1)
+                    showResultMessage(true)
+                } else {
+                    markAnswerWrong(layoutAnswer1,
+                        tvVariantNumber1,
+                        tvVariantValue1)
+                    showResultMessage(false)
+                }
+            }
+
+            layoutAnswer2.setOnClickListener{
+                if(questionGenerator.answer(1)) {
+                    markAnswerCorrect(layoutAnswer2,
+                        tvVariantNumber2,
+                        tvVariantValue2)
+                    showResultMessage(true)
+                } else {
+                    markAnswerWrong(layoutAnswer2,
+                        tvVariantNumber2,
+                        tvVariantValue2)
+                    showResultMessage(false)
+                }
+            }
+
+            layoutAnswer3.setOnClickListener{
+                if(questionGenerator.answer(2)) {
+                    markAnswerCorrect(layoutAnswer3,
+                        tvVariantNumber3,
+                        tvVariantValue3)
+                    showResultMessage(true)
+                } else {
+                    markAnswerWrong(layoutAnswer3,
+                        tvVariantNumber3,
+                        tvVariantValue3)
+                    showResultMessage(false)
+                }
+            }
+
+            layoutAnswer4.setOnClickListener{
+                if(questionGenerator.answer(3)) {
+                    markAnswerCorrect(layoutAnswer4,
+                        tvVariantNumber4,
+                        tvVariantValue4)
+                    showResultMessage(true)
+                } else {
+                    markAnswerWrong(layoutAnswer4,
+                        tvVariantNumber4,
+                        tvVariantValue4)
+                    showResultMessage(false)
+                }
+            }
+        }
+    }
+    private fun setStartOnClicks() {
         with(binding) {
             btnContinue.setOnClickListener {
                 layoutResult.isVisible = false
@@ -80,13 +169,14 @@ class LearnWordActivity : AppCompatActivity() {
                 startActivity(intent)
             }
 
-            pbQuestionProgress.apply {
-                max = questionGenerator.numOfQuestions
-                progress = 1
-            }
-
         }
+    }
 
+    private fun setStartProgressBar() {
+        binding.pbQuestionProgress.apply {
+            max = questionGenerator.numOfQuestions
+            progress = 1
+        }
     }
 
     private fun markAnswerNeutral(
@@ -99,8 +189,6 @@ class LearnWordActivity : AppCompatActivity() {
             this@LearnWordActivity,
             R.drawable.shape_rounded_container
         )
-
-
 
         tvVariantValue.setTextColor(ContextCompat.getColor(
             this@LearnWordActivity,
@@ -204,88 +292,10 @@ class LearnWordActivity : AppCompatActivity() {
         }
     }
 
-    private fun showNextQuestion(questionGenerator: QuestionGenerator) {
-        val testProgress: TestProgress = questionGenerator.nextQuestion()
-        changeProgressBar(testProgress.numOfCurQuestion)
-        val question: Question? = testProgress.curQuestion
-
-        with(binding) {
-            if (question == null) {
-                val intent: Intent = Intent(this@LearnWordActivity, TestResultActivity::class.java)
-                intent.putParcelableArrayListExtra("answers", ArrayList(testProgress.wrongAnswers))
-                startActivity(intent)
-            } else {
-                tvWordToTranslate.isVisible = true
-                layoutAnswers.isVisible = true
-                btnSkip.isVisible = true
-                tvWordToTranslate.text = question.correctAnswer.original
-
-                tvVariantValue1.text = question.variants[0].translated
-                tvVariantValue2.text = question.variants[1].translated
-                tvVariantValue3.text = question.variants[2].translated
-                tvVariantValue4.text = question.variants[3].translated
-            }
-
-            layoutAnswer1.setOnClickListener{
-                if(questionGenerator.answer(0)) {
-                    markAnswerCorrect(layoutAnswer1,
-                        tvVariantNumber1,
-                        tvVariantValue1)
-                    showResultMessage(true)
-                } else {
-                    markAnswerWrong(layoutAnswer1,
-                        tvVariantNumber1,
-                        tvVariantValue1)
-                    showResultMessage(false)
-                }
-            }
-
-            layoutAnswer2.setOnClickListener{
-                if(questionGenerator.answer(1)) {
-                    markAnswerCorrect(layoutAnswer2,
-                        tvVariantNumber2,
-                        tvVariantValue2)
-                    showResultMessage(true)
-                } else {
-                    markAnswerWrong(layoutAnswer2,
-                        tvVariantNumber2,
-                        tvVariantValue2)
-                    showResultMessage(false)
-                }
-            }
-
-            layoutAnswer3.setOnClickListener{
-                if(questionGenerator.answer(2)) {
-                    markAnswerCorrect(layoutAnswer3,
-                        tvVariantNumber3,
-                        tvVariantValue3)
-                    showResultMessage(true)
-                } else {
-                    markAnswerWrong(layoutAnswer3,
-                        tvVariantNumber3,
-                        tvVariantValue3)
-                    showResultMessage(false)
-                }
-            }
-
-            layoutAnswer4.setOnClickListener{
-                if(questionGenerator.answer(3)) {
-                    markAnswerCorrect(layoutAnswer4,
-                        tvVariantNumber4,
-                        tvVariantValue4)
-                    showResultMessage(true)
-                } else {
-                    markAnswerWrong(layoutAnswer4,
-                        tvVariantNumber4,
-                        tvVariantValue4)
-                    showResultMessage(false)
-                }
-            }
-        }
-    }
 
     private fun changeProgressBar(progress: Int) {
         binding.pbQuestionProgress.progress = progress
         binding.tvProgressText.text = progress.toString()
     }
+
 }

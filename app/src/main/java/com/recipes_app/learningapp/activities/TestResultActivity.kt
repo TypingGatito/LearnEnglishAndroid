@@ -14,6 +14,7 @@ import com.recipes_app.learningapp.databinding.ActivityTestResultBinding
 import com.recipes_app.learningapp.models.questions.Answer
 import com.recipes_app.learningapp.presenters.TestResultPresenter
 import com.recipes_app.learningapp.presenters.TestResultPresenterMain
+import com.recipes_app.learningapp.views.TestResultView
 
 class TestResultActivity : AppCompatActivity(), TestResultView {
     private var _binding: ActivityTestResultBinding? = null
@@ -35,15 +36,13 @@ class TestResultActivity : AppCompatActivity(), TestResultView {
         _binding = ActivityTestResultBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setOnClicks()
-        showAnswers()
-        showResultText()
+        setToMainButtonOnClick()
 
         presenter = TestResultPresenterMain(this)
-        presenter.onViewCreated()
+        presenter.onViewCreated(intent.getParcelableArrayListExtra("wrong_answers"))
     }
 
-    private fun setOnClicks() {
+    private fun setToMainButtonOnClick() {
         with(binding) {
             btnBackToMain.setOnClickListener {
                 val intent: Intent = Intent(this@TestResultActivity, MainScreenActivity::class.java)
@@ -52,17 +51,15 @@ class TestResultActivity : AppCompatActivity(), TestResultView {
         }
     }
 
-    override fun showAnswers() {
+    override fun showAnswers(answers: List<Answer>?) {
         with(binding) {
-            val answers: List<Answer>? = intent.getParcelableArrayListExtra("answers")
             rvWrongAnswers.adapter = AnswerAdapter(answers!!)
 
             rvWrongAnswers.layoutManager = LinearLayoutManager(this@TestResultActivity)
         }
     }
 
-    override fun showResultText() {
-        val answers: List<Answer>? = intent.getParcelableArrayListExtra("answers")
+    override fun showResultText(answers: List<Answer>?) {
         with(binding) {
             tvResultDescription.text = ContextCompat.getString(this@TestResultActivity, R.string.desc_result_pref) +
                     " " + (answers?.size ?: 0) + " " + ContextCompat.getString(this@TestResultActivity, R.string.desc_result_post)

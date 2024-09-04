@@ -15,22 +15,28 @@ import com.recipes_app.learningapp.adapters.ThemesSpinnerAdapter
 import com.recipes_app.learningapp.databinding.ActivityMainScreenBinding
 import com.recipes_app.learningapp.business_classes.QuestionGenerator
 import com.recipes_app.learningapp.business_classes.QuestionGeneratorPreload
+import com.recipes_app.learningapp.presenters.MainScreenPresenter
+import com.recipes_app.learningapp.presenters.MainScreenPresenterMain
+import com.recipes_app.learningapp.presenters.TestResultPresenterMain
 import com.recipes_app.learningapp.repositories.words.WordRepositorySqlite
 import com.recipes_app.learningapp.services.words.WordService
+import com.recipes_app.learningapp.views.MainScreenView
 import com.recipes_app.learningapp.workers.UserActivityWorker
 import java.util.concurrent.TimeUnit
 
-class MainScreenActivity : AppCompatActivity() {
+class MainScreenActivity : AppCompatActivity(), MainScreenView {
     private var _binding: ActivityMainScreenBinding? = null
     private val binding
         get() = _binding ?: throw IllegalStateException("Binding in MainScreen is null")
 
-    private var _questionGenerator: QuestionGenerator? = null
+    private lateinit var presenter: MainScreenPresenter
 
-    private val questionGenerator: QuestionGenerator
-        get() = _questionGenerator ?: throw IllegalStateException("QuestionGenerator is null")
+ //   private var _questionGenerator: QuestionGenerator? = null
 
-    private var availableThemes: Set<String> = HashSet<String>()
+//    private val questionGenerator: QuestionGenerator
+//        get() = _questionGenerator ?: throw IllegalStateException("QuestionGenerator is null")
+//
+//    private var availableThemes: Set<String> = HashSet<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,11 +52,13 @@ class MainScreenActivity : AppCompatActivity() {
         _binding = ActivityMainScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        _questionGenerator = QuestionGeneratorPreload(WordService(WordRepositorySqlite(this@MainScreenActivity, null)))
+        presenter = MainScreenPresenterMain(this@MainScreenActivity, this@MainScreenActivity)
 
-        availableThemes = questionGenerator.getThemes()
+        //_questionGenerator = QuestionGeneratorPreload(WordService(WordRepositorySqlite(this@MainScreenActivity, null)))
 
-        setOnClicks()
+        //availableThemes = questionGenerator.getThemes()
+
+        setStartTestButtonOnClick()
 
         val sharedPreferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -58,12 +66,20 @@ class MainScreenActivity : AppCompatActivity() {
         editor.apply()
 
         setNotifications()
+        setStartTestButtonOnClick()
+        setSeekBarOnClick()
 
-//        val appInstallReceiver = AppInstallReceiver()
-//        registerReceiver(appInstallReceiver, IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED))
+        presenter.setSeekBarAdapter()
     }
 
-    private fun setOnClicks() {
+    override fun setSeekBarAdapter(availableThemes: Set<String>) {
+        val adapter = ThemesSpinnerAdapter(this@MainScreenActivity,
+            availableThemes.toList())
+
+        binding.spinnerThemes.adapter = adapter
+    }
+
+    private fun setStartTestButtonOnClick() {
         with (binding) {
             btnStartTest.setOnClickListener {
                 val numOfWords: Int = sbNumOfWords.progress
@@ -76,7 +92,12 @@ class MainScreenActivity : AppCompatActivity() {
                 startActivity(intent)
             }
 
-            sbNumOfWords.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+        }
+    }
+
+    private fun setSeekBarOnClick() {
+        with(binding) {
+            sbNumOfWords.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                     tvNumOfWords.text = "Количество слов: $progress"
                 }
@@ -87,12 +108,6 @@ class MainScreenActivity : AppCompatActivity() {
                 override fun onStopTrackingTouch(seekBar: SeekBar) {
                 }
             })
-
-            val adapter = ThemesSpinnerAdapter(this@MainScreenActivity,
-                availableThemes.toList())
-
-            spinnerThemes.adapter = adapter
-
         }
     }
 
@@ -102,6 +117,5 @@ class MainScreenActivity : AppCompatActivity() {
 
         WorkManager.getInstance(this).enqueue(checkUserActivityWorkRequest)
     }
-
 
 }
