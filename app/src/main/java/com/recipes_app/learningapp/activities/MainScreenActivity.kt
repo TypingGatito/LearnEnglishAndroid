@@ -31,13 +31,6 @@ class MainScreenActivity : AppCompatActivity(), MainScreenView {
 
     private lateinit var presenter: MainScreenPresenter
 
- //   private var _questionGenerator: QuestionGenerator? = null
-
-//    private val questionGenerator: QuestionGenerator
-//        get() = _questionGenerator ?: throw IllegalStateException("QuestionGenerator is null")
-//
-//    private var availableThemes: Set<String> = HashSet<String>()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -53,10 +46,6 @@ class MainScreenActivity : AppCompatActivity(), MainScreenView {
         setContentView(binding.root)
 
         presenter = MainScreenPresenterMain(this@MainScreenActivity, this@MainScreenActivity)
-
-        //_questionGenerator = QuestionGeneratorPreload(WordService(WordRepositorySqlite(this@MainScreenActivity, null)))
-
-        //availableThemes = questionGenerator.getThemes()
 
         setStartTestButtonOnClick()
 

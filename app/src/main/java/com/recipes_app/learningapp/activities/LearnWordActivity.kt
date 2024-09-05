@@ -12,25 +12,16 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.recipes_app.learningapp.R
 import com.recipes_app.learningapp.databinding.ActivityLearnWordBinding
-import com.recipes_app.learningapp.models.questions.Question
-import com.recipes_app.learningapp.business_classes.QuestionGenerator
-import com.recipes_app.learningapp.business_classes.QuestionGeneratorPreload
-import com.recipes_app.learningapp.models.questions.TestProgress
+import com.recipes_app.learningapp.models.questions.Answer
 import com.recipes_app.learningapp.presenters.LearnWordPresenter
 import com.recipes_app.learningapp.presenters.LearnWordPresenterMain
-import com.recipes_app.learningapp.repositories.words.WordRepositorySqlite
-import com.recipes_app.learningapp.services.words.WordService
+import com.recipes_app.learningapp.views.LearnWordView
 import java.util.ArrayList
 
-class LearnWordActivity : AppCompatActivity() {
+class LearnWordActivity : AppCompatActivity(), LearnWordView {
     private var _binding: ActivityLearnWordBinding? = null
     private val binding
         get() = _binding ?: throw IllegalStateException("Binding in LearnWordActivity is null")
-
-    private var _questionGenerator: QuestionGenerator? = null
-
-    private val questionGenerator: QuestionGenerator
-        get() = _questionGenerator ?: throw IllegalStateException("QuestionGenerator is null")
 
     private lateinit var presenter: LearnWordPresenter
 
@@ -49,98 +40,40 @@ class LearnWordActivity : AppCompatActivity() {
 
         _binding = ActivityLearnWordBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        _questionGenerator = QuestionGeneratorPreload(WordService(WordRepositorySqlite(this@LearnWordActivity, null)))
 
-        presenter = LearnWordPresenterMain()
+        presenter = LearnWordPresenterMain(this, this)
 
 
         val numOfWords = intent.getIntExtra("numOfWords", 0)
         val theme: String = "" + intent.getStringExtra("theme")
-        questionGenerator.startTest(numOfWords, theme)
-        showNextQuestion(questionGenerator)
+        presenter.startTest(numOfWords, theme)
 
+        showNextQuestion()
         setStartOnClicks()
-        setStartProgressBar()
     }
-    private fun showNextQuestion(questionGenerator: QuestionGenerator) {
-        val testProgress: TestProgress = questionGenerator.nextQuestion()
-        changeProgressBar(testProgress.numOfCurQuestion)
-        val question: Question? = testProgress.curQuestion
+
+    private fun showNextQuestion() {
+        presenter.showNextQuestion()
 
         with(binding) {
-            if (question == null) {
-                val intent: Intent = Intent(this@LearnWordActivity, TestResultActivity::class.java)
-                intent.putParcelableArrayListExtra("wrong_answers", ArrayList(testProgress.wrongAnswers))
-                startActivity(intent)
-            } else {
-                tvWordToTranslate.isVisible = true
-                layoutAnswers.isVisible = true
-                btnSkip.isVisible = true
-                tvWordToTranslate.text = question.correctAnswer.original
-
-                tvVariantValue1.text = question.variants[0].translated
-                tvVariantValue2.text = question.variants[1].translated
-                tvVariantValue3.text = question.variants[2].translated
-                tvVariantValue4.text = question.variants[3].translated
-            }
-
             layoutAnswer1.setOnClickListener{
-                if(questionGenerator.answer(0)) {
-                    markAnswerCorrect(layoutAnswer1,
-                        tvVariantNumber1,
-                        tvVariantValue1)
-                    showResultMessage(true)
-                } else {
-                    markAnswerWrong(layoutAnswer1,
-                        tvVariantNumber1,
-                        tvVariantValue1)
-                    showResultMessage(false)
-                }
+                presenter.option1Clicked()
             }
 
             layoutAnswer2.setOnClickListener{
-                if(questionGenerator.answer(1)) {
-                    markAnswerCorrect(layoutAnswer2,
-                        tvVariantNumber2,
-                        tvVariantValue2)
-                    showResultMessage(true)
-                } else {
-                    markAnswerWrong(layoutAnswer2,
-                        tvVariantNumber2,
-                        tvVariantValue2)
-                    showResultMessage(false)
-                }
+                presenter.option2Clicked()
             }
 
             layoutAnswer3.setOnClickListener{
-                if(questionGenerator.answer(2)) {
-                    markAnswerCorrect(layoutAnswer3,
-                        tvVariantNumber3,
-                        tvVariantValue3)
-                    showResultMessage(true)
-                } else {
-                    markAnswerWrong(layoutAnswer3,
-                        tvVariantNumber3,
-                        tvVariantValue3)
-                    showResultMessage(false)
-                }
+                presenter.option3Clicked()
             }
 
             layoutAnswer4.setOnClickListener{
-                if(questionGenerator.answer(3)) {
-                    markAnswerCorrect(layoutAnswer4,
-                        tvVariantNumber4,
-                        tvVariantValue4)
-                    showResultMessage(true)
-                } else {
-                    markAnswerWrong(layoutAnswer4,
-                        tvVariantNumber4,
-                        tvVariantValue4)
-                    showResultMessage(false)
-                }
+                presenter.option4Clicked()
             }
         }
     }
+
     private fun setStartOnClicks() {
         with(binding) {
             btnContinue.setOnClickListener {
@@ -157,11 +90,11 @@ class LearnWordActivity : AppCompatActivity() {
                 markAnswerNeutral(layoutAnswer4,
                     tvVariantNumber4,
                     tvVariantValue4)
-                showNextQuestion(questionGenerator)
+                showNextQuestion()
             }
 
             btnSkip.setOnClickListener {
-                showNextQuestion(questionGenerator)
+                showNextQuestion()
             }
 
             btnClose.setOnClickListener {
@@ -172,12 +105,105 @@ class LearnWordActivity : AppCompatActivity() {
         }
     }
 
-    private fun setStartProgressBar() {
+    override fun showAnswerResult(isCorrect: Boolean, optionNumber: Int) {
+        with(binding) {
+            when (optionNumber) {
+                1 -> {
+                    if (isCorrect) {
+                        markAnswerCorrect(layoutAnswer1, tvVariantNumber1, tvVariantValue1)
+                    } else {
+                        markAnswerWrong(layoutAnswer1, tvVariantNumber1, tvVariantValue1)
+                    }
+                }
+                2 -> {
+                    if (isCorrect) {
+                        markAnswerCorrect(layoutAnswer2, tvVariantNumber2, tvVariantValue2)
+                    } else {
+                        markAnswerWrong(layoutAnswer2, tvVariantNumber2, tvVariantValue2)
+                    }
+                }
+                3 -> {
+                    if (isCorrect) {
+                        markAnswerCorrect(layoutAnswer3, tvVariantNumber3, tvVariantValue3)
+                    } else {
+                        markAnswerWrong(layoutAnswer3, tvVariantNumber3, tvVariantValue3)
+                    }
+                }
+                4 -> {
+                    if (isCorrect) {
+                        markAnswerCorrect(layoutAnswer4, tvVariantNumber4, tvVariantValue4)
+                    } else {
+                        markAnswerWrong(layoutAnswer4, tvVariantNumber4, tvVariantValue4)
+                    }
+                }
+            }
+        }
+
+        disableOptionsOnClicks()
+    }
+
+    override fun setProgressBar(value: Int) {
         binding.pbQuestionProgress.apply {
-            max = questionGenerator.numOfQuestions
+            max = value
             progress = 1
         }
     }
+
+
+    override fun showResultMessage(isCorrect: Boolean): Unit {
+        val color: Int
+        val messageText: String
+        val resIconResource: Int
+
+        if (isCorrect) {
+            color = ContextCompat.getColor(this@LearnWordActivity, R.color.correctGreenColor)
+            messageText = ContextCompat.getString(this@LearnWordActivity, R.string.message_correct)
+            resIconResource = R.drawable.ic_correct
+        } else {
+            color = ContextCompat.getColor(this@LearnWordActivity, R.color.wrongRedColor)
+            messageText = ContextCompat.getString(this@LearnWordActivity, R.string.message_wrong)
+            resIconResource = R.drawable.ic_wrong
+        }
+
+        with(binding) {
+            btnSkip.isVisible = false
+            layoutResult.isVisible = true
+            btnContinue.setTextColor(color)
+            layoutResult.setBackgroundColor(color)
+            ivResultIcon.setImageResource(resIconResource)
+            tvAnswerDescription.setText(messageText)
+        }
+    }
+
+    override fun changeProgressBar(progress: Int) {
+        binding.pbQuestionProgress.progress = progress
+        binding.tvProgressText.text = progress.toString()
+    }
+
+    override fun toMain(wrongAnswers: List<Answer>) {
+        val intent: Intent = Intent(this@LearnWordActivity, TestResultActivity::class.java)
+        intent.putParcelableArrayListExtra("wrong_answers", ArrayList(wrongAnswers))
+        startActivity(intent)
+    }
+
+    override fun setTranslationOptions(v1: String, v2: String, v3: String, v4: String) {
+        with(binding) {
+            tvVariantValue1.text = v1
+            tvVariantValue2.text = v2
+            tvVariantValue3.text = v3
+            tvVariantValue4.text = v4
+        }
+    }
+
+    override fun setWordToTranslate(word: String) {
+        with (binding) {
+            tvWordToTranslate.isVisible = true
+            layoutAnswers.isVisible = true
+            btnSkip.isVisible = true
+            tvWordToTranslate.text = word
+        }
+    }
+
 
     private fun markAnswerNeutral(
         layoutAnswer: LinearLayout,
@@ -246,56 +272,33 @@ class LearnWordActivity : AppCompatActivity() {
     ) {
         layoutAnswer.background = ContextCompat.getDrawable(
             this@LearnWordActivity,
-            R.drawable.shape_rounded_container_wrong
-        )
+            R.drawable.shape_rounded_container_wrong)
 
         tvVariantNumber.background = ContextCompat.getDrawable(
             this@LearnWordActivity,
-            R.drawable.shape_rounded_variants_wrong
-        )
+            R.drawable.shape_rounded_variants_wrong)
 
         tvVariantNumber.setTextColor(ContextCompat.getColor(
             this,
-            R.color.white
-        )
+            R.color.white)
         )
 
         tvVariantValue.setTextColor(ContextCompat.getColor(
             this,
-            R.color.wrongRedColor
-        )
+            R.color.wrongRedColor)
         )
     }
 
-    private fun showResultMessage(isCorrect: Boolean): Unit {
-        val color: Int
-        val messageText: String
-        val resIconResource: Int
-
-        if (isCorrect) {
-            color = ContextCompat.getColor(this@LearnWordActivity, R.color.correctGreenColor)
-            messageText = ContextCompat.getString(this@LearnWordActivity, R.string.message_correct)
-            resIconResource = R.drawable.ic_correct
-        } else {
-            color = ContextCompat.getColor(this@LearnWordActivity, R.color.wrongRedColor)
-            messageText = ContextCompat.getString(this@LearnWordActivity, R.string.message_wrong)
-            resIconResource = R.drawable.ic_wrong
-        }
-
+    private fun disableOptionsOnClicks() {
         with(binding) {
-            btnSkip.isVisible = false
-            layoutResult.isVisible = true
-            btnContinue.setTextColor(color)
-            layoutResult.setBackgroundColor(color)
-            ivResultIcon.setImageResource(resIconResource)
-            tvAnswerDescription.setText(messageText)
+            layoutAnswer1.setOnClickListener(null)
+
+            layoutAnswer2.setOnClickListener(null)
+
+            layoutAnswer3.setOnClickListener(null)
+
+            layoutAnswer4.setOnClickListener(null)
         }
-    }
-
-
-    private fun changeProgressBar(progress: Int) {
-        binding.pbQuestionProgress.progress = progress
-        binding.tvProgressText.text = progress.toString()
     }
 
 }
